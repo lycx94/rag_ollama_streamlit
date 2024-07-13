@@ -1,0 +1,7 @@
+llama-index-embeddings-huggingface==0.2.2
+torch==2.3.1
+llama-index-llms-ollama==0.1.5
+llama-index==0.10.54.post1
+streamlit1.36.0
+ollama==0.2.1
+streamlit-feedback==0.1.3
