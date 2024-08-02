@@ -10,11 +10,8 @@ from llama_index.llms.ollama import Ollama
 
 
 EMDED_MODEL = "BAAI/bge-small-en-v1.5"
-LLM = "llama3"
-
 TOP_K = 2
-CHUNK_SIZE = 512
-CHEUNK_OVERLAP = 64
+
 
 def setup_embed_model():
     print("Setting up embedding model...")
@@ -42,6 +39,9 @@ def load_documents():
 def build_vector_db():
     setup_embed_model()
     st.caption("Embedding model loaded!")
+    
+    Settings.chunk_size = st.session_state["chunk_size"]
+    Settings.chunk_overlap = st.session_state["chunk_overlap"]
     documents = load_documents()
     try:
         index = VectorStoreIndex.from_documents(documents, show_progress=True)
@@ -60,8 +60,7 @@ TEXT_QA_SYSTEM_PROMPT = ChatMessage(
         "and not prior knowledge.\n"
         "Here are some important rules for the interaction:\n"
         "1. Never directly reference the given context in your answer.\n"
-        "2. Only answer questions that are covered in the Context. If the user's question is not in the context or is not on topic, don't answer it. Instead say. I'm sorry I don't know the answer to that\n"
-        "3. Be short yet consice"
+        "2. Only answer questions that are covered in the Context. If the user's question is not in the context or is not on topic, don't make an answer.\n"
     ),
     role=MessageRole.SYSTEM,
 )
@@ -94,11 +93,13 @@ def setup_retriever_query_engine():
             similarity_top_k=TOP_K,
         )
 
-        Settings.llm = Ollama(model=LLM, request_timeout=60.0)
+        Settings.llm = Ollama(model=st.session_state["model_name"], request_timeout=60.0)
+
         response_synthesizer = get_response_synthesizer(
             llm=Settings.llm,
             text_qa_template=CUSTOM_QA_PROMPT,
-            streaming=True 
+            streaming=True,
+            response_mode="compact", 
         )
 
         retriever_query_engine = RetrieverQueryEngine(
@@ -107,6 +108,7 @@ def setup_retriever_query_engine():
         )
 
         st.session_state["retriever_query_engine"] = retriever_query_engine
+
         return retriever_query_engine
     
     except Exception as e:
@@ -117,7 +119,6 @@ def get_response_from_engine(prompt):
     try:
         stream = st.session_state["retriever_query_engine"].query(prompt)
         for text in stream.response_gen:
-            # print(str(text), end="", flush=True)
             yield str(text)
     except Exception as e:
         print(f"Error getting response from engine: {e}")
@@ -125,5 +126,5 @@ def get_response_from_engine(prompt):
 
 
 def setup_llm():
-    Settings.llm = Ollama(model=LLM, request_timeout=60.0)
+    Settings.llm = Ollama(model=st.session_state["model_name"], request_timeout=60.0)
     return Settings.llm

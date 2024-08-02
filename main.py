@@ -1,4 +1,4 @@
-from src.streamlit_layout import sidebar, main_area
+from src.streamlit_app import sidebar, main_area
 
 def main():
     sidebar()
