@@ -1,9 +1,24 @@
-# RAG Chatbot Project
-
-This project implements a Retrieval-Augmented Generation (RAG) chatbot using Streamlit and Ollama. 
-<br>This project allows you to use the chatbot offline, so you don’t have to worry about data leakage.
+# Retrieval-Augmented Generation (RAG) Chatbot
 
 ![RAG Chatbot demo](https://github.com/lycx94/rag_ollama_streamlit/blob/main/demo.gif)
+
+This project implements a Retrieval-Augmented Generation (RAG) chatbot using Streamlit, LlamaIndex, and Ollama. 
+
+By leveraging LlamaIndex Response Synthesizers, it creates more context-aware question-answering systems, thereby improving the overall quality and relevance of generated responses. 
+
+With Ollama, the model can be run locally, which offers several advantages:
+
+## Advantages of Local Deployment with Ollama
+
+1. **Cost Efficiency**
+   - Running the model locally eliminates the need for costly API calls to external services, significantly reducing operational expenses.
+
+2. **Data Privacy**
+   - Local deployment ensures that sensitive data remains within the user's infrastructure, enhancing data security and privacy.
+
+3. **Reliability**
+   - Local deployment mitigates risks associated with external service outages or rate limits, ensuring consistent availability and performance.
+
 
 ## Quick Start
 
@@ -15,17 +30,29 @@ This project implements a Retrieval-Augmented Generation (RAG) chatbot using Str
     pip install -r requirements.txt
     ```
 
-3. Download the model using [Ollama](https://ollama.com/library). For this repository, `llama3` is used. 
-    <br>**Ensure you use WSL on Windows as it is not directly supported.** 
-
+3. Download and run the model 
+    - Install [Ollama](https://ollama.com/library) on your system
+    - Pull and run the Llama3 model
     ```sh
-    ollama run llama3
+    ollama run llama3.1
     ```
 
-4. Run the application offline
+4. Run the Streamlit Application
 
     ```sh
     streamlit run main.py
     ```
 
-5. Upload your documents and start chatting!
+5. Use the Chatbot
+    - Open your web browser and navigate to the provided local URL
+    - Upload your documents through the interface
+    - Start interacting with the RAG-powered chatbot!
+
+
+### Additional Information
+
+- **WSL on Windows**  
+  If you are using Windows, you need to set up Windows Subsystem for Linux (WSL). Follow [this guide](https://docs.microsoft.com/en-us/windows/wsl/install) to install WSL and set up a Linux distribution on your Windows machine.
+
+- **Model Customization**  
+  If you need to use a different model or customize the current model, refer to the [Ollama documentation](https://ollama.com/blog) for more details.
