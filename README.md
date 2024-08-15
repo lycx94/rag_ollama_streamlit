@@ -4,7 +4,7 @@
 
 This project implements a Retrieval-Augmented Generation (RAG) chatbot using Streamlit, LlamaIndex, and Ollama. 
 
-By leveraging LlamaIndex Response Synthesizers, it creates more context-aware question-answering systems, thereby improving the overall quality and relevance of generated responses. 
+The LlamaIndex LLM Router enables the model to choose the most suitable data source. It decides whether to summarize (e.g., with a summary index query engine) or perform a semantic search (e.g., with a vector index query engine), ensuring the responses are both accurate and aligned with the user's query.
 
 With Ollama, the model can be run locally, which offers several advantages:
 

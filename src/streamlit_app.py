@@ -1,5 +1,5 @@
 import streamlit as st
-from src.rag import setup_retriever_query_engine, get_response_from_engine
+from src.rag import setup_retriever_query_engine, get_response_from_engine, router_query_engine
 from streamlit_feedback import streamlit_feedback
 import csv
 import os
@@ -16,18 +16,10 @@ def sidebar():
         if "file_list" not in st.session_state:
             st.session_state["file_list"] = []
 
-        st.session_state["model_name"] = st.selectbox(
-            "LLM",
-            ('llama3.1', 'llama3')
-        )
-        
         st.session_state["chunk_size"] = st.number_input("Chunk size", value=1024)
-
         st.session_state["chunk_overlap"]= st.number_input("Chunk overlap", value=20)
-
-        st.session_state["top_k"]= st.number_input("top_k", value=5)
-        
-
+        st.session_state["top_k"]= st.number_input("top_k", value=2)
+    
         st.sidebar.button('Clear Chat History', on_click=clear_chat_history)
         
         st.markdown("Upload Your Data Files")
@@ -42,20 +34,18 @@ def sidebar():
                 if st.button("Load", key="load_file_button"):
                     with st.spinner("Loading..."):
                         save_to_dir_and_setup_engine()
-                        st.write("You can start chatting!") 
 
 def main_area():    
 
-
-    if "retriever_query_engine" not in st.session_state:
-        st.session_state["retriever_query_engine"] = None
-    
     st.title("Chat with documents")
     st.caption("Leave feedback to help me improve!")
 
     if "messages" not in st.session_state:
         st.session_state["messages"] = [{"role": "assistant", "content": "Ask me anything about your file."}]
 
+    if "query_engine" not in st.session_state:
+        st.session_state["query_engine"] = None
+    
     if "response" not in st.session_state:
         st.session_state["response"] = None
 
@@ -72,13 +62,16 @@ def main_area():
         messages.append({"role": "user", "content": prompt})
         st.chat_message("user").write(prompt)
 
-        if st.session_state["retriever_query_engine"]:
+        if st.session_state["query_engine"]:
             with st.chat_message("assistant"):
                 with st.spinner("Thinking..."):
                     try:                
-                        resp = st.write_stream(
-                                get_response_from_engine( prompt)  
-                            )  
+                        # TODO: add Router Query Engine Streaming
+                        # resp = st.write_stream(
+                        #         get_response_from_engine( prompt)  
+                        #     )  
+                        resp = get_response_from_engine( prompt) 
+                        st.write(str(resp))
                         messages.append({"role": "assistant", "content": resp})
                         st.session_state["response"] = resp    
                     except Exception as e:
@@ -89,7 +82,7 @@ def main_area():
             st.stop()
 
 
-    if st.session_state["retriever_query_engine"] and st.session_state["response"]:
+    if st.session_state["query_engine"] and st.session_state["response"]:
         feedback = streamlit_feedback(
             feedback_type="thumbs",
             optional_text_label="[Optional] Please provide an explanation",
@@ -103,9 +96,6 @@ def main_area():
                     writer.writerow(["User Prompt", "Engine Response", "Feedback Type", "Feedback Score", "Feedback Text"])
                 writer.writerow([st.session_state["prompt"], st.session_state["response"], feedback['type'], feedback['score'], feedback['text']])
 
-
-     
- 
 
 def save_to_dir_and_setup_engine():
     save_dir = os.getcwd() + "/data"
@@ -123,4 +113,6 @@ def save_to_dir_and_setup_engine():
             print("Error saving upload to disk.")
 
     st.caption("Files uploaded!")
-    setup_retriever_query_engine()
+    # setup_retriever_query_engine()
+    st.session_state["query_engine"] = router_query_engine()
+    st.write("You can start chatting!") 
